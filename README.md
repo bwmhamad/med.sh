@@ -68,4 +68,4 @@ Currently only tested on Ubuntu 16.04 but should work fine on any Ubuntu or mayb
 - [ ] Create C/C++ project or package (if you guys like this script :) ).
 
 ## Notice 
-This software is provided as it is without any warranty. Project was created for personal needs. Your contribution is valuable to us, feel free to add any changes and fixes for the script. 
+This software is provided as is without any warranty of any kind. Project was created for personal needs. Your contribution is valuable to us, feel free to add any changes and fixes for the script. 
