@@ -65,6 +65,8 @@ Currently only tested on Ubuntu 16.04 but should work fine on any Ubuntu or mayb
 - [ ] Display only disks that are encrypted with BitLocker.
 - [ ] Better handle for arguments.
 - [ ] Test and adapt on other distributions.
+- [ ] Option to mount disk with permissions.
+- [ ] Auto-install script.
 - [ ] Create C/C++ project or package (if you guys like this script :) ).
 
 ## Notice 
