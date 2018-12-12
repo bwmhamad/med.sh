@@ -4,10 +4,15 @@ Mount Encrypted Disk is a utility script to mount disks that are encrypted with 
 ## Features
 1. Automates the process of mounting disks with `dislocker`
 2. Provides UI similar to Windows. 
-![UI](img/screen1.png)
+
+![UI](img/screen1.png) 
+
 3. Works both with sudo and without it (asks for sudo password.)
-![no sudo](img/screen2.png)
+
+![no sudo](img/screen2.png) 
+
 4. Adds Launcher icon.
+
 ![launcher](img/screen3.png)
 
 ## Getting Started
