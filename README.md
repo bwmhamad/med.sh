@@ -1,5 +1,5 @@
 # Welcome to med.sh
-Mount Encrypted Disk is a utility script to mount disks that are encrypted with BitLocker on Ubuntu. Using zenity package, MED provides UI that facilitates process of mounting. It also adds icon to Ubuntu launcher for easy access.
+Mount Encrypted Disk is a utility script to mount disks that are encrypted with BitLocker on Ubuntu. Using `dislocker` and `zenity` packages, MED provides UI that facilitates process of mounting. It also adds icon to Ubuntu launcher for easy access.
 
 ## Features
 1. Automates the process of mounting disks with `dislocker`
