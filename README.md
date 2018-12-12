@@ -2,7 +2,8 @@
 Mount Encrypted Disk is a utility script to mount disks that are encrypted with BitLocker on Ubuntu. Using zenity package, MED provides UI that facilitates process of mounting. It also adds icon to Ubuntu launcher for easy access.
 
 ## Getting Started
-### 1. Clone this repository on Ubuntu. Recommended directory is `/opts/` but any directory should work fine. ###
+### 1. Clone this repository on Ubuntu. ###
+Recommended directory is `/opts/` but any directory should work fine.
 ```
 git clone https://github.com/bwmhamad/med.sh.git
 ```
