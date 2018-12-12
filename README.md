@@ -6,7 +6,7 @@ Mount Encrypted Disk is a utility script to mount disks that are encrypted with 
 ```
 git clone https://github.com/bwmhamad/med.sh.git
 ```
-2. Install (dislocker)[https://tuxdiary.com/2015/03/20/dislocker/]
+2. Install [dislocker](https://tuxdiary.com/2015/03/20/dislocker/)
 ```
 sudo apt-get install libmbedcrypto0 libmbedtls-dev libfuse-dev
 ```
@@ -33,8 +33,8 @@ sudo ln -s /opt/med.sh/med.sh /usr/bin/med
 ```
 
 ##Dependencies
-(dislocker)[https://github.com/Aorimn/dislocker] 
-(zenity)[https://github.com/GNOME/zenity]
+[dislocker](https://github.com/Aorimn/dislocker) 
+[zenity](https://github.com/GNOME/zenity)
 
 ## Compatibility
 Currently only tested on Ubuntu 16.4 but should work fine on any Ubuntu or even any GNOME distributive.
