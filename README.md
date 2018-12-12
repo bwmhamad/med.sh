@@ -16,12 +16,13 @@ Mount Encrypted Disk is a utility script to mount disks that are encrypted with 
 ![launcher](img/screen3.png)
 
 ## Getting Started
-### 1. Clone this repository on Ubuntu. ###
+
+### 1. Clone this repository on Ubuntu.
 Recommended directory is `/opts/` but any directory should work fine.
 ```
 git clone https://github.com/bwmhamad/med.sh.git
 ```
-### 2. Install [dislocker](https://tuxdiary.com/2015/03/20/dislocker/) ###
+### 2. Install [dislocker](https://tuxdiary.com/2015/03/20/dislocker/)
 ```
 sudo apt-get install libmbedcrypto0 libmbedtls-dev libfuse-dev
 ```
@@ -37,17 +38,17 @@ cmake .
 make
 sudo make install
 ```
-### 3. Install missing dependencies **(should be already installed though)** ###
+### 3. Install missing dependencies **(should be already installed though)**
  ```
 sudo apt install zenity
 sudo apt install lsblk
 ```
-### 4. Add symbolic link **(optional)** ###
+### 4. Add symbolic link **(optional)**
 ```
 sudo ln -s /opt/med.sh/med.sh /usr/bin/med
 ```
 
-### 5. Add launcher icon
+### 5. Add launcher icon **(optional)**
 ```
 med -l install
 ```
@@ -57,12 +58,13 @@ med -l install
 2. [zenity](https://github.com/GNOME/zenity)
 
 ## Compatibility
-Currently only tested on Ubuntu 16.4 but should work fine on any Ubuntu or even any GNOME distributive.
+Currently only tested on Ubuntu 16.04 but should work fine on any Ubuntu or maybe even any distribution with GNOME.
 
 ## @TODO
 - [ ] Add script that handles messages to allow CLI only usage.
 - [ ] Display only disks that are encrypted with BitLocker.
 - [ ] Better handle for arguments.
+- [ ] Test and adapt on other distributions.
 - [ ] Create C/C++ project or package (if you guys like this script :) ).
 
 ## Notice 
