@@ -56,7 +56,7 @@ app_install()
 	#fi
 	echo "Exec=$0" >> $APPLOC
 	echo "Icon=$DIR/icon.png" >> $APPLOC
-	./med-launcher.sh -a $APPNAME
+	$DIR/med-launcher.sh -a $APPNAME
 }
 
 app_remove()
@@ -65,7 +65,7 @@ app_remove()
 	APPNAME=med.desktop
 	APPLOC=/home/$USER/.local/share/applications/$APPNAME
 	rm $APPLOC
-	./med-launcher.sh -r $APPNAME
+	$DIR/med-launcher.sh -r $APPNAME
 }
 
 main()
@@ -91,7 +91,7 @@ main()
 	if [ "$isroot" == 1 ]; then
 		/opt/med/mount.sh $disk $password
 	elif ! [ -z "$sudopass" ]; then
-		echo $sudopass | sudo -S /opt/med/mount.sh $disk $password
+		echo $sudopass | sudo -S $DIR/mount.sh $disk $password
 	else
 		sudo /opt/med/mount.sh $disk $password
 	fi
