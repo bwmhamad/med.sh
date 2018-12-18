@@ -1,8 +1,8 @@
 # Welcome to med.sh
-Mount Encrypted Drive is a utility script to mount drives that are encrypted with BitLocker on Ubuntu. Using `dislocker` and `zenity` packages, MED provides UI that facilitates process of mounting. It also adds icon to Ubuntu launcher for easy access.
+Mount Encrypted Drive is a utility script for Linux that provides GUI/CLI for mounting and unmounting drives that are locked with BitLocker. MED is built with `dislocker` and `zenity` packages. Script can also add icon to launcher for easy access.
 
 ## Features
-1. Automates the process of mounting drives with `dislocker`
+1. Automates the process of mounting/unmounting drives with `dislocker`
 2. Provides UI similar to Windows. 
 
 ![UI](img/screen1.png) 
@@ -61,9 +61,9 @@ med -l install
 Currently only tested on Ubuntu 16.04 but should work fine on any Ubuntu or maybe even any distribution with GNOME.
 
 ## @TODO
-- [ ] Add script that handles messages to allow CLI only usage.
+- [x] Add script that handles messages to allow CLI only usage.
 - [ ] Display only drives that are encrypted with BitLocker.
-- [ ] Better handle for arguments.
+- [x] Better handle for arguments.
 - [ ] Test and adapt on other distributions.
 - [ ] Option to mount drive with permissions.
 - [ ] Auto-install script.
