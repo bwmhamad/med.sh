@@ -13,7 +13,7 @@ Mount Encrypted Drive is a utility script to mount drives that are encrypted wit
 
 4. Adds Launcher icon.
 
-![launcher](img/screen3.png)
+![launcher](img/screen3.jpg)
 
 ## Getting Started
 
