@@ -1,134 +1,203 @@
 #!/bin/bash
-#Mount Encrypted Disk: Utility script for linux (ubuntu) to mount BitLocker disks in similar way it works on Windows
+#Mount Encrypted Disk: Utility script for linux (ubuntu) to mount BitLocker disks with dislocker
 #Author: Mohammad Saad
 #Github: https://github.com/bwmhamad/med.sh.git
 #Dependencies: dislocker, zenity, lsblk
 
-#below vars are used for app install only
-SCRIPT=`realpath $0`
+#imports
+_MED_DIR=$(dirname $([ -L $0 ] && readlink -f $0 || echo $0))
+source "$_MED_DIR/med-ui.sh"
+
+#below consts are used for app install only
 APPNAME=med.desktop
 APPLOC=/home/$USER/.local/share/applications/$APPNAME
 APPTEMP=template.app
-DIR="$(dirname "$(readlink -f "$0")")"
+
+#arguments
+m=0
+u=0
+l=""
+d=""
+
+#below vars may change by the script
+isroot=0
+
+check_root()
+{
+	if [ "$EUID" -ne 0 ]; then
+		isroot=0
+	else
+		isroot=1
+	fi
+}
+
+usage()
+{
+	local scriptname=$(basename $0)
+	echo "Usage:"
+	echo "  $scriptname -m [disk-path] [OPTIONS...]"
+	echo "  $scriptname -u [disk-path] [OPTIONS...]"
+	echo "  $scriptname -l <install|remove> [OPTIONS...]"
+	echo "Mounts BitLocker disk with help of GUI/CLI"
+	echo ""
+	echo "  -m          triggers ui to mount disk"
+	echo "  -u          triggers ui to unmount disk"
+	echo "  -d          disk path for unmounting. If this is specified, no ui is shown"
+	echo "  -l          installs/uninstalls launcher application"
+	echo "  -c          input/output through command line. Default is gui"
+	echo "  -v          set verbose level: [1-6]"
+}
 
 get_disks_list()
 {
-	echo `lsblk -fpr | awk '/sda[0-9]/ { if($2 == "") print $1}' | sed 'N;s/\n/|/'`
+	echo `lsblk -fpr | awk '/sda[0-9]/ { if($2 == "") print $1}'`
 }
 
-show_dialog()
+un_mount_ui()
 {
-	disks=$(get_disks_list)
-	if [ $isroot -eq 0 ];then
-		local output=$(zenity --forms --separator=" " --timeout=30 --text "Mount Encrypted Disk" --add-combo disk --combo-values "$disks" --add-password "disk password" --add-password "sudo password")
-	else
-		local output=$(zenity --forms --separator=" " --timeout=30 --text "Mount Encrypted Disk" --add-combo disk --combo-values "$disks" --add-password "disk password")
+	local disks=$(get_disks_list)
+	local opts=$(med_ui_umount "$disks" $isroot)
+	if [[ "$opts" == "cancelled" ]]; then
+		log "Mount cancelled by user"
+		exit
+	elif [[ "$opts" == "timeout" ]]; then
+		med_ui_message "No input received withing timeout period"
+		exit
 	fi
-	local accepted=$?
-	if ((accepted == 0)); then
-		echo $output
-	elif ((accepted == 1)); then
-		echo "cancelled"
-	else
-		echo "timeout"
+	echo $opts
+	read disk sudopass <<< $opts
+	if [ -z "$disk" ]; then
+		med_ui_error "disk cannot be null"
+		exit
 	fi
+	un_mount "$disk" "$sudopass"
 }
 
 un_mount()
 {
-	if [ "$isroot" == 0 ]; then
-		echo "Please run this as root to unmount"
-		exit
+	local disk=$1
+	local sudopath=$2
+	if [ "$isroot" == 1 ]; then
+		$_MED_DIR/med-mount.sh -u "$disk"
+	elif ! [ -z "$sudopass" ]; then
+		echo $sudopass | sudo -S $_MED_DIR/med-mount.sh -u "$disk"
+	else
+		sudo $_MED_DIR/med-mount.sh -u "$disk"
 	fi
-	diskname=$(basename $1)
-	umount /media/mount-$diskname
-	umount /media/disk-$diskname
-	rm -rf /media/mount-$diskname
-	rm -rf /media/disk-$diskname
 }
 
 app_install()
 {	
-	cp "$DIR/$APPTEMP" $APPLOC
-	#if [ "$isroot" == 0 ]; then	
+	cp "$_MED_DIR/$APPTEMP" $APPLOC
+	#if [ "$isroot" == 0 ]; then
 	#else
 	#	sudo -u $USER cp "$DIR/$APPTEMP" $APPLOC
 	#fi
-	echo "Exec=$0" >> $APPLOC
-	echo "Icon=$DIR/icon.png" >> $APPLOC
-	$DIR/med-launcher.sh -a $APPNAME
+	echo "Exec=$0 -m" >> $APPLOC
+	echo "Icon=$_MED_DIR/icon.png" >> $APPLOC
+	echo "[Desktop Action Med-Unmount]" >> $APPLOC
+	echo "Name=Unmount Disk" >> $APPLOC
+	echo "Exec=$0 -u" >> $APPLOC
+	$_MED_DIR/med-launcher.sh -a $APPNAME
 }
 
 app_remove()
 {
-	SCRIPT=`realpath $0`
-	APPNAME=med.desktop
-	APPLOC=/home/$USER/.local/share/applications/$APPNAME
 	rm $APPLOC
-	$DIR/med-launcher.sh -r $APPNAME
+	$_MED_DIR/med-launcher.sh -r $APPNAME
 }
 
-main()
-{	
-	opts=$(show_dialog)
-	if [[ "$opts" == "cancelled" ]]; then
-		echo "Mount cancelled by user"
+parse_args()
+{
+	local jobs_c=0
+	while getopts ":l:ucmv:" o; do
+		case "${o}" in
+			l)
+				l=${OPTARG}
+				if ! [ "$l" == "install" ] && ! [ "$l" == "remove" ]; then
+					usage
+					exit
+				fi
+				((jobs_c++))
+				;;
+			u)
+				u=1
+				((jobs_c++))
+				;;
+			c)
+				med_ui_cli
+				;;
+			m)
+				m=1
+				((jobs_c++))
+				;;
+			d)
+				d=${OPTARG}
+				((jobs_c++))
+				;;
+			v)
+				log_set_level ${OPTARG}
+				;;
+			*)
+				usage
+				exit
+				;;
+		esac
+	done
+	shift $((OPTIND-1))
+
+	if [ $jobs_c -gt 1 ]; then
+		usage
 		exit
-	elif [[ "$opts" == "timout" ]]; then
-		echo "No input received withing timeout period"
+	fi
+}
+
+mount_ui()
+{
+	local disks=$(get_disks_list)
+	local opts=$(med_ui_mount "$disks" $isroot)
+	if [[ "$opts" == "cancelled" ]]; then
+		log "Mount cancelled by user"
+		exit
+	elif [[ "$opts" == "timeout" ]]; then
+		med_ui_message "No input received withing timeout period"
 		exit
 	fi
 
 	read disk password sudopass <<<$opts
 	if [ -z "$password" ]; then
-		echo "Password cannot be empty"
+		med_ui_error "Password cannot be empty"
 		exit
 	elif [ -z "$disk" ]; then
-		echo "Disk cannot be empty"
+		med_ui_error "Disk cannot be empty"
 		exit
 	fi
 	
 	if [ "$isroot" == 1 ]; then
-		/opt/med/mount.sh $disk $password
+		$_MED_DIR/med-mount.sh -m $disk $password
 	elif ! [ -z "$sudopass" ]; then
-		echo $sudopass | sudo -S $DIR/mount.sh $disk $password
+		echo $sudopass | sudo -S $_MED_DIR/med-mount.sh -m $disk $password
 	else
-		sudo /opt/med/mount.sh $disk $password
+		sudo $_MED_DIR/med-mount.sh -m $disk $password
 	fi
 }
 
-if [ "$EUID" -ne 0 ]; then
-	isroot=0
-else
-	isroot=1
-fi
-
-if [ $# -eq 2 ] && [ "$1" == "-u" ]; then
-	un_mount $2
-	exit
-fi
-
-if [ $# -eq 2 ] && [ "$1" == "-l" ]; then
-	if [ "$2" == "install" ]; then
-		app_install	
-		exit
-	elif [ "$2" == "remove" ]; then
-		app_remove
-		exit
+main()
+{	check_root
+	parse_args $@
+	if ! [ -z "$l" ]; then
+		app_$l
+	elif [ $u -eq 1 ]; then
+		if ! [ -z "$d" ]; then
+			un_mount $d
+		else
+			un_mount_ui
+		fi
+	elif [ $m -eq 1 ]; then
+		mount_ui
+	else
+		usage
 	fi
-fi
+}
 
-if [ $# -ne 0 ]; then
-	scriptname=$(basename $0)
-	echo "Usage:"
-	echo "  $scriptname"
-	echo "  $scriptname -l <install|remove>"
-	echo "  $scriptname -u <disk-path>"
-	echo "Mounts BitLocker disk with help of UI similar to Windows"
-	echo ""
-	echo "  -u          unmounts specified disk, previously mounted with med"
-	echo "  -l          installs/uninstalls launcher application"
-	exit
-fi
-
-main
+main $@
